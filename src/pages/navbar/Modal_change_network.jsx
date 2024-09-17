@@ -17,7 +17,7 @@ const Modal_change_network = (props) => {
                             }}
                         >
                             {/* 文字を白くする */}
-                            <h2>私たちの利用するamoyに接続してください</h2>
+                            <h2>私たちの利用するBergに接続してください</h2>
                             <br />
                             <button
                                 type="button"
