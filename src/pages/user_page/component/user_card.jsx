@@ -11,6 +11,8 @@ function User_card(props) {
     const [image_url, SetImage_url] = useState(props.icons);
     const [nameError, SetNameError] = useState("");
     const [state, Setstate] = useState("");
+    const [totalScore, setTotalScore] = useState(0); // 特定日付以降の合計スコア
+    const targetDate = "2024-09-21"; // 特定の日付（例：2024年9月20日以降）
 
     const update_handler = () => {
         console.log("update_handler");
@@ -22,6 +24,22 @@ function User_card(props) {
             Setstate(false);
         }
     };
+    
+    // 特定の日以降のスコアを計算する関数
+    const calculateTotalScoreForSpecificPeriod = (targetDate, answers) => {
+        let total = 0;
+        const target = new Date(targetDate); // 絞り込み対象の日付
+        answers.forEach((answer) => {
+            const answerDate = new Date(answer.answer_time * 1000); // UNIXタイムスタンプを通常の時間に変換
+
+            // 特定の日付以降の回答のみを合計
+            if (answerDate >= target) {
+                total += answer.reward; // 獲得スコアを合計
+            }
+        });
+        return total;
+    };
+    
     const handle_SetName = (event) => {
         const value = event.target.value;
         SetName(value);
@@ -37,6 +55,19 @@ function User_card(props) {
             SetNameError(false);
         }
     };
+
+    // クイズデータを取得してスコアを計算する関数
+    const fetchAndCalculateScore = async () => {
+        try {
+            // スマートコントラクトから全ての回答データを一括取得
+            const answers = await props.cont.methods.get_all_answers().call(); 
+            const total = calculateTotalScoreForSpecificPeriod(targetDate, answers); // 日付で絞り込んで合計
+            setTotalScore(total); // 合計スコアを状態に保存
+        } catch (error) {
+            console.error("Error fetching quiz data:", error);
+        }
+    };
+
     //初回のみ実行
     useEffect(() => {
         console.log("初回のみ実行");
@@ -44,95 +75,35 @@ function User_card(props) {
         console.log(props.user_name);
         console.log(props.icons);
         Setstate(props.state);
+        fetchAndCalculateScore();
     }, []);
+    return (
+        <>
+            <div className="user_card">
+                <Button variant="primary" onClick={() => props.cont.add_token_wallet()} style={{ position: "absolute", top: 0, left: 0 }}>
+                    トークンをwalletに追加
+                </Button>
+                <div className="address" style={{ "margin-top": "50px" }}>
+                    {props.address.slice(0, 20)}....
+                </div>
 
-    if (true) {
-        return (
-            <>
-                <div className="user_card">
-                    {/* q:左上に表示 */}
-
-                    {/* <Button variant="primary" onClick={() => Setstate(false)} style={{ position: 'absolute', top: 0, left: 0 }}>
-                        更新
-                    </Button> */}
-                    {/* <img
-                        src={props.icons}
-                        alt=""
-                        style={{
-                            width: `75px`,
-                            height: `75px`,
-                            borderRadius: '50%',
-                        }}
-                    /> */}
-                    {/* <div className="user_name">{props.user_name}</div> */}
-                    <Button variant="primary" onClick={() => props.cont.add_token_wallet()} style={{ position: "absolute", top: 0, left: 0 }}>
-                        トークンをwalletに追加
-                    </Button>
-                    <div className="address" style={{ "margin-top": "50px" }}>
-                        {props.address.slice(0, 20)}....
+                {/* マージンを設定 */}
+                <div className="row" style={{ marginTop: "20px" }}>
+                    <div className="col token d-flex flex-column">
+                        <div>保有トークン</div>
+                        <div>{props.token}FLT</div>
                     </div>
-
-                    {/* マージンを設定 */}
-                    <div className="row" style={{ marginTop: "20px" }}>
-                        <div className="col token d-flex flex-column">
-                            <div>保有トークン</div>
-                            <div>{props.token}FLT</div>
-                        </div>
-                        <div className="col token-result d-flex flex-column">
-                            <div>現在の順位</div>
-                            <div>{props.num_of_student}人中{props.rank}位</div>
-                        </div>
-                        <div className="col token-result d-flex flex-column">
-                            <div>獲得点数</div>
-                            <div>{Number(props.result)/40}点</div>
-                        </div>
+                    <div className="col token-result d-flex flex-column">
+                        <div>現在の順位</div>
+                        <div>{props.num_of_student}人中{props.rank}位</div>
+                    </div>
+                    <div className="col token-result d-flex flex-column">
+                        <div>2024年9月20日以降の獲得点数</div>
+                        <div>{totalScore/20}点</div> {/* 特定日付以降の合計点数を表示 */}
                     </div>
                 </div>
-            </>
-        );
-    } else {
-        return (
-            <>
-                <div className="user_card">
-                    <Button variant="primary" onClick={() => Setstate(true)} style={{ position: "absolute", top: 0, left: 0 }}>
-                        <>キャンセル</>
-                    </Button>
-                    <div style={{ "margin-top": "30px" }}>
-                        <Form onSubmit={update_handler}>
-                            <div className="icon_image">
-                                <Form.Group className="mb-3" controlId="form_image_url" style={{ textAlign: "left" }}>
-                                    <Form.Label>アイコン</Form.Label>
-                                    <Form.Control type="text" placeholder="image_url" value={image_url} onChange={(event) => SetImage_url(event.target.value)} />
-                                </Form.Group>
-                            </div>
-                            <img src={image_url} alt="" style={{ width: `75px`, height: `75px`, borderRadius: "50%" }} />
-
-                            <div className="user_name">
-                                {nameError && <p style={{ color: "red" }}>入力形式が間違っています</p>}
-                                <Form.Group className="mb-3" controlId="form_name" style={{ textAlign: "left" }}>
-                                    <Form.Label>User_Name 例:22P5000</Form.Label>
-                                    <Form.Control type="name" placeholder="Enter Name" value={name} onChange={handle_SetName} />
-                                </Form.Group>
-                            </div>
-                            <Button variant="primary" onClick={update_handler} style={{ marginTop: "20px" }}>
-                                <>更新</>
-                            </Button>
-                        </Form>
-                    </div>
-                    <div className="address">{props.address.slice(0, 20)}</div>
-                    <div className="row" style={{ marginTop: "20px" }}>
-                        <div className="col token d-flex flex-column">
-                            <div>保有トークン</div>
-                            <div>{props.token}FLT</div>
-                        </div>
-                        <div className="col token-result d-flex flex-column">
-                            <div>授業での配点</div>
-                            <div>{Number(props.result)/40}点</div>
-                        </div>
-                    </div>
-                </div>
-            </>
-        );
-    }
+            </div>
+        </>
+    );
 }
 export default User_card;
