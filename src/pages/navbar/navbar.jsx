@@ -21,23 +21,7 @@ function create_col1() {
     );
 }
 
-function create_edit_button(prop) {
-    return (
-        <div className="col-3">
-            <Nav.Item>
-                <Nav.Link eventKey="edit" href={prop + "/edit_list"}>
-                    <div className="col-12">
-                        <RiFileSettingsLine size={30} />
-                    </div>
-                    <div className="col-12 d-flex justify-content-center align-items-center">
-                        <font size="2">テストの編集</font>
-                    </div>
-                </Nav.Link>
-            </Nav.Item>
-        </div>
-    );
-}
-
+// 出題ボタンの定義
 function create_quiz_button(prop) {
     return (
         <div className="col-3">
@@ -48,6 +32,23 @@ function create_quiz_button(prop) {
                     </div>
                     <div className="col-12 d-flex justify-content-center align-items-center">
                         <font size="2">出題</font>
+                    </div>
+                </Nav.Link>
+            </Nav.Item>
+        </div>
+    );
+}
+
+function create_edit_button(prop) {
+    return (
+        <div className="col-3">
+            <Nav.Item>
+                <Nav.Link eventKey="edit" href={prop + "/edit_list"}>
+                    <div className="col-12">
+                        <RiFileSettingsLine size={30} />
+                    </div>
+                    <div className="col-12 d-flex justify-content-center align-items-center">
+                        <font size="2">テストの編集</font>
                     </div>
                 </Nav.Link>
             </Nav.Item>
@@ -98,7 +99,8 @@ function Nav_menu(props) {
                             </Nav.Item>
                         </div>
                         {!isTeacher ? create_col1() : ""}
-                        {!isTeacher ? create_edit_button(props.home) : create_col1()}
+                        {/* 先生のみ出題ボタンを表示 */}
+                        {isTeacher ? create_quiz_button(props.home) : create_col1()}
                         <div className="col-3">
                             <Nav.Item>
                                 <Nav.Link eventKey="user_page" href={props.home + "/user_page/" + useing_address}>
