@@ -100,7 +100,8 @@ function Nav_menu(props) {
                         </div>
                         {!isTeacher ? create_col1() : ""}
                         {/* 先生のみ出題ボタンを表示 */}
-                        {isTeacher ? create_quiz_button(props.home) : create_col1()}
+                        {isTeacher ? create_quiz_button(props.home) : ""}
+                        {!isTeacher ? create_col1() : ""}
                         <div className="col-3">
                             <Nav.Item>
                                 <Nav.Link eventKey="user_page" href={props.home + "/user_page/" + useing_address}>
