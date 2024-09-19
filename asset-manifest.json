@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/web3-sotuken/static/css/main.0895cd51.css",
+    "main.css": "/web3-sotuken/static/css/main.51111f1b.css",
     "main.js": "/web3-sotuken/static/js/main.5647860d.js",
     "static/js/858.e4ba1612.chunk.js": "/web3-sotuken/static/js/858.e4ba1612.chunk.js",
     "static/js/787.affd1f6c.chunk.js": "/web3-sotuken/static/js/787.affd1f6c.chunk.js",
@@ -8,13 +8,13 @@
     "static/media/logo.svg": "/web3-sotuken/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "static/media/blocto-icon.svg": "/web3-sotuken/static/media/blocto-icon.ff8c029ba3c3588f8924488fe25239d5.svg",
     "index.html": "/web3-sotuken/index.html",
-    "main.0895cd51.css.map": "/web3-sotuken/static/css/main.0895cd51.css.map",
+    "main.51111f1b.css.map": "/web3-sotuken/static/css/main.51111f1b.css.map",
     "main.5647860d.js.map": "/web3-sotuken/static/js/main.5647860d.js.map",
     "858.e4ba1612.chunk.js.map": "/web3-sotuken/static/js/858.e4ba1612.chunk.js.map",
     "787.affd1f6c.chunk.js.map": "/web3-sotuken/static/js/787.affd1f6c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0895cd51.css",
+    "static/css/main.51111f1b.css",
     "static/js/main.5647860d.js"
   ]
 }
