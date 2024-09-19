@@ -75,7 +75,7 @@ function Nav_menu(props) {
     return (
         <>
             <Modal_change_network chain_id={chain_id} cont={props.cont} />
-            <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+            <div className="row" style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
                 <Navbar
                     fixed="bottom"
                     bg="light"

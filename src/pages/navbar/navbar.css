@@ -25,3 +25,9 @@
   height: 100vh;
   background-image: linear-gradient(0deg, #00dedc, #115d89, #080f1c);
 }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
