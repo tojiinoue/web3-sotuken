@@ -38,6 +38,23 @@ function create_edit_button(prop) {
     );
 }
 
+function create_quiz_button(prop) {
+    return (
+        <div className="col-3">
+            <Nav.Item>
+                <Nav.Link eventKey="create_quiz" href={prop + "/create_quiz"}>
+                    <div className="col-12">
+                        <MdOutlineQuiz size={30} />
+                    </div>
+                    <div className="col-12 d-flex justify-content-center align-items-center">
+                        <font size="2">出題</font>
+                    </div>
+                </Nav.Link>
+            </Nav.Item>
+        </div>
+    );
+}
+
 function Nav_menu(props) {
     const [useing_address, Set_useing_address] = useState(null);
     const [chain_id, setChain_id] = useState(null);
@@ -81,19 +98,7 @@ function Nav_menu(props) {
                             </Nav.Item>
                         </div>
                         {!isTeacher ? create_col1() : ""}
-                        <div className="col-3">
-                            <Nav.Item>
-                                <Nav.Link eventKey="create_quiz" href={props.home + "/create_quiz"}>
-                                    <div className="col-12 ">
-                                        <MdOutlineQuiz size={30} />
-                                    </div>
-                                    <div className="col-12 d-flex justify-content-center align-items-center">
-                                        <font size="2">出題</font>
-                                    </div>
-                                </Nav.Link>
-                            </Nav.Item>
-                        </div>
-                        {!isTeacher ? create_col1() : ""}
+                        {!isTeacher ? create_edit_button(props.home) : create_col1()}
                         <div className="col-3">
                             <Nav.Item>
                                 <Nav.Link eventKey="user_page" href={props.home + "/user_page/" + useing_address}>
