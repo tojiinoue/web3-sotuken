@@ -12,7 +12,7 @@ function User_card(props) {
     const [nameError, SetNameError] = useState("");
     const [state, Setstate] = useState("");
     const [totalScore, setTotalScore] = useState(0); // 特定日付以降の合計スコア
-    const targetDate = "2024-09-21"; // 特定の日付（例：2024年9月20日以降）
+    const targetDate = "2024-09-20"; // 特定の日付（例：2024年9月20日以降）
 
     const update_handler = () => {
         console.log("update_handler");
