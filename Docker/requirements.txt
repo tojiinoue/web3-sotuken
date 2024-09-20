@@ -1,0 +1,7 @@
+Django==3.2.5
+numpy
+DateTime
+requests
+django-rest-framework
+django-cors-headers
+Pillow
