@@ -97,7 +97,7 @@ function Simple_quiz(props) {
     console.log(isreward)
     const search = useLocation().search;
     console.log(props.quiz);
-    const cardStatusClass = Number(props.quiz[10]) === 1 ? 'bg-blue' : '';//追加した
+    const cardStatusClass = Number(props.quiz[10]) === 0 ? 'bg-blue' : '';//追加した
     return (
         <>
             {/* <Modal show={show} setShow={setShow} id={props.quiz[0].toNumber()} /> */}
