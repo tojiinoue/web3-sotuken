@@ -70,6 +70,7 @@ function Time_diff(props) {
     }
 
     //console.log(parseInt(props.limit["_hex"]));
+    console.log("クイズの回答状況 (props.quiz[10]):", props.quiz[10]);
     return (
         <div>
             {/* {now}<br/>
