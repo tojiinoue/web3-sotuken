@@ -3,7 +3,7 @@ import {useState, useEffect, useRef} from "react";
 import {useParams} from "react-router-dom";
 import Login from "../../contract/login";
 //cssをimport
-import "./user_page.css";
+import "./component/user_page.css";
 import History_list from "./component/history_list";
 import User_card from "./component/user_card";
 import {icons} from "react-icons/lib";
