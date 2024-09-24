@@ -1,109 +1,82 @@
-import { useState, useEffect } from "react";
+import {Contracts_MetaMask} from "../../contract/contracts";
+import {useState, useEffect, useRef} from "react";
+import {useParams} from "react-router-dom";
+import Login from "../../contract/login";
+//cssをimport
+import "./user_page.css";
+import History_list from "./component/history_list";
+import User_card from "./component/user_card";
+import {icons} from "react-icons/lib";
 
-import { AiOutlineArrowRight } from "react-icons/ai";
-import Change_user from "./change_user";
+function User_page() {
+    const {address} = useParams();
 
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
+    //User_cardへの表示用
+    const [icons, SetIcons] = useState(null);
+    const [user_name, Setuser_name] = useState(null);
 
-function User_card(props) {
-    const [name, SetName] = useState(props.user_name);
-    const [image_url, SetImage_url] = useState(props.icons);
-    const [nameError, SetNameError] = useState("");
-    const [state, Setstate] = useState("");
-    const [totalScore, setTotalScore] = useState(0); // 特定日付以降の合計スコア
-    const targetDate = "2024-09-20"; // 特定の日付（例：2024年9月20日以降）
+    const [result, SetResult] = useState(null);
+    const [token, Set_token] = useState(null);
+    const [state, Set_state] = useState(null);
+    const [rank, setRank] = useState(null);
+    const [num_of_student, setNum_of_student] = useState(null); 
+    //クイズの総数
+    const [history_sum, Set_history_sum] = useState(null);
+    //現在表示している個数を保持するref
+    const now_numRef = useRef(0);
+    const targetRef = useRef(null); // ターゲット要素のrefを作成
 
-    const update_handler = () => {
-        console.log("update_handler");
-        console.log(name);
-        console.log(image_url);
-        if (nameError == false) {
-            props.cont.update_user_data(name, image_url);
-        } else {
-            Setstate(false);
-        }
-    };
-    
-    // 特定の日以降のスコアを計算する関数
-    const calculateTotalScoreForSpecificPeriod = (targetDate, answers) => {
-        let total = 0;
-        const target = new Date(targetDate); // 絞り込み対象の日付
-        answers.forEach((answer) => {
-            const answerDate = new Date(answer.answer_time * 1000); // UNIXタイムスタンプを通常の時間に変換
+    let cont = new Contracts_MetaMask();
+    const [history_list, Set_history_list] = useState([]);
 
-            // 特定の日付以降の回答のみを合計
-            if (answerDate >= target) {
-                total += answer.reward; // 獲得スコアを合計
-            }
+    const get_variable = async () => {
+        Set_token(await cont.get_token_balance(address));
+        let [user_name, image, result, state] = await cont.get_user_data(address);
+        console.log(user_name, image, state);
+        Setuser_name(user_name);
+        SetIcons(image);
+        SetResult(result / 10 ** 18);
+        setRank(await cont.get_rank(result));
+        setNum_of_student(await cont.get_num_of_students());
+        Set_state(state);
+
+        cont.get_user_history_len(address).then((data) => {
+            // Promise オブジェクトが解決された後の処理を記述
+            console.log(Number(data));
+            Set_history_sum(Number(data));
+            now_numRef.current = Number(data);
         });
-        return total;
-    };
-    
-    const handle_SetName = (event) => {
-        const value = event.target.value;
-        SetName(value);
-
-        // 電話番号の正規表現パターン
-        const phonePattern = /^\d{2}[a-zA-Z]\d{4}$/;
-
-        // 入力値が正規表現にマッチしない場合は、エラーメッセージを設定
-        if (!phonePattern.test(value)) {
-            SetNameError(true);
-            console.log("errr");
-        } else {
-            SetNameError(false);
-        }
-    };
-
-    // クイズデータを取得してスコアを計算する関数
-    const fetchAndCalculateScore = async () => {
-        try {
-            // スマートコントラクトから全ての回答データを一括取得
-            const answers = await props.cont.methods.get_all_answers().call(); 
-            const total = calculateTotalScoreForSpecificPeriod(targetDate, answers); // 日付で絞り込んで合計
-            setTotalScore(total); // 合計スコアを状態に保存
-        } catch (error) {
-            console.error("Error fetching quiz data:", error);
-        }
     };
 
     //初回のみ実行
     useEffect(() => {
-        console.log("初回のみ実行");
-        console.log(props.state);
-        console.log(props.user_name);
-        console.log(props.icons);
-        Setstate(props.state);
-        fetchAndCalculateScore();
+        get_variable();
     }, []);
-    return (
-        <>
-            <div className="user_card">
-                <Button variant="primary" onClick={() => props.cont.add_token_wallet()} style={{ position: "absolute", top: 0, left: 0 }}>
-                    トークンをwalletに追加
-                </Button>
-                <div className="address" style={{ "margin-top": "50px" }}>
-                    {props.address.slice(0, 20)}....
-                </div>
 
-                {/* マージンを設定 */}
-                <div className="row" style={{ marginTop: "20px" }}>
-                    <div className="col token d-flex flex-column">
-                        <div>保有トークン</div>
-                        <div>{props.token}FLT</div>
+    if (history_sum != null) {
+        return (
+            <div className="mypage">
+                <User_card address={address} icons={icons} user_name={user_name} token={token} result={result} state={state} rank={rank} num_of_student={num_of_student} cont={cont} />
+                <History_list cont={cont} history_sum={history_sum} Set_history_sum={Set_history_sum} history_list={history_list} Set_history_list={Set_history_list} targetRef={targetRef} now_numRef={now_numRef} address={address} />
+
+                <div className="token-history">
+                    <div className="title">Token History</div>
+                    <div className="timeline">
+                        {history_list.map((history, index) => {
+                            // console.log(quiz);
+                            return <>{history}</>;
+                        })}
                     </div>
-                    <div className="col token-result d-flex flex-column">
-                        <div>現在の順位</div>
-                        <div>{props.num_of_student}人中{props.rank}位</div>
-                    </div>
-                    <div className="col token-result d-flex flex-column">
-                        <div>2024年9月20日以降の獲得点数</div>
-                        <div>{totalScore/20}点</div> {/* 特定日付以降の合計点数を表示 */}
+                    <div ref={targetRef}>
+                        {/* ターゲット要素aの内容 */}
+                        now_loading
                     </div>
                 </div>
             </div>
-        </>
-    );
+        );
+    } else {
+        return <></>;
+    }
 }
-export default User_card;
+
+export default User_page;
