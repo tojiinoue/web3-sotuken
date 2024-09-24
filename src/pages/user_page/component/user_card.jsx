@@ -1,82 +1,138 @@
-import {Contracts_MetaMask} from "../../contract/contracts";
-import {useState, useEffect, useRef} from "react";
-import {useParams} from "react-router-dom";
-import Login from "../../contract/login";
-//cssをimport
-import "./user_page.css";
-import History_list from "./component/history_list";
-import User_card from "./component/user_card";
-import {icons} from "react-icons/lib";
+import { useState, useEffect } from "react";
 
-function User_page() {
-    const {address} = useParams();
+import { AiOutlineArrowRight } from "react-icons/ai";
+import Change_user from "./change_user";
 
-    //User_cardへの表示用
-    const [icons, SetIcons] = useState(null);
-    const [user_name, Setuser_name] = useState(null);
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
-    const [result, SetResult] = useState(null);
-    const [token, Set_token] = useState(null);
-    const [state, Set_state] = useState(null);
-    const [rank, setRank] = useState(null);
-    const [num_of_student, setNum_of_student] = useState(null); 
-    //クイズの総数
-    const [history_sum, Set_history_sum] = useState(null);
-    //現在表示している個数を保持するref
-    const now_numRef = useRef(0);
-    const targetRef = useRef(null); // ターゲット要素のrefを作成
+function User_card(props) {
+    const [name, SetName] = useState(props.user_name);
+    const [image_url, SetImage_url] = useState(props.icons);
+    const [nameError, SetNameError] = useState("");
+    const [state, Setstate] = useState("");
 
-    let cont = new Contracts_MetaMask();
-    const [history_list, Set_history_list] = useState([]);
-
-    const get_variable = async () => {
-        Set_token(await cont.get_token_balance(address));
-        let [user_name, image, result, state] = await cont.get_user_data(address);
-        console.log(user_name, image, state);
-        Setuser_name(user_name);
-        SetIcons(image);
-        SetResult(result / 10 ** 18);
-        setRank(await cont.get_rank(result));
-        setNum_of_student(await cont.get_num_of_students());
-        Set_state(state);
-
-        cont.get_user_history_len(address).then((data) => {
-            // Promise オブジェクトが解決された後の処理を記述
-            console.log(Number(data));
-            Set_history_sum(Number(data));
-            now_numRef.current = Number(data);
-        });
+    const update_handler = () => {
+        console.log("update_handler");
+        console.log(name);
+        console.log(image_url);
+        if (nameError == false) {
+            props.cont.update_user_data(name, image_url);
+        } else {
+            Setstate(false);
+        }
     };
+    const handle_SetName = (event) => {
+        const value = event.target.value;
+        SetName(value);
 
+        // 電話番号の正規表現パターン
+        const phonePattern = /^\d{2}[a-zA-Z]\d{4}$/;
+
+        // 入力値が正規表現にマッチしない場合は、エラーメッセージを設定
+        if (!phonePattern.test(value)) {
+            SetNameError(true);
+            console.log("errr");
+        } else {
+            SetNameError(false);
+        }
+    };
     //初回のみ実行
     useEffect(() => {
-        get_variable();
+        console.log("初回のみ実行");
+        console.log(props.state);
+        console.log(props.user_name);
+        console.log(props.icons);
+        Setstate(props.state);
     }, []);
 
-    if (history_sum != null) {
+    if (true) {
         return (
-            <div className="mypage">
-                <User_card address={address} icons={icons} user_name={user_name} token={token} result={result} state={state} rank={rank} num_of_student={num_of_student} cont={cont} />
-                <History_list cont={cont} history_sum={history_sum} Set_history_sum={Set_history_sum} history_list={history_list} Set_history_list={Set_history_list} targetRef={targetRef} now_numRef={now_numRef} address={address} />
+            <>
+                <div className="user_card">
+                    {/* q:左上に表示 */}
 
-                <div className="token-history">
-                    <div className="title">Token History</div>
-                    <div className="timeline">
-                        {history_list.map((history, index) => {
-                            // console.log(quiz);
-                            return <>{history}</>;
-                        })}
+                    {/* <Button variant="primary" onClick={() => Setstate(false)} style={{ position: 'absolute', top: 0, left: 0 }}>
+                        更新
+                    </Button> */}
+                    {/* <img
+                        src={props.icons}
+                        alt=""
+                        style={{
+                            width: `75px`,
+                            height: `75px`,
+                            borderRadius: '50%',
+                        }}
+                    /> */}
+                    {/* <div className="user_name">{props.user_name}</div> */}
+                    <Button variant="primary" onClick={() => props.cont.add_token_wallet()} style={{ position: "absolute", top: 0, left: 0 }}>
+                        トークンをwalletに追加
+                    </Button>
+                    <div className="address" style={{ "margin-top": "50px" }}>
+                        {props.address.slice(0, 20)}....
                     </div>
-                    <div ref={targetRef}>
-                        {/* ターゲット要素aの内容 */}
-                        now_loading
+
+                    {/* マージンを設定 */}
+                    <div className="row" style={{ marginTop: "20px" }}>
+                        <div className="col token d-flex flex-column">
+                            <div>保有トークン</div>
+                            <div>{props.token}FLT</div>
+                        </div>
+                        <div className="col token-result d-flex flex-column">
+                            <div>現在の順位</div>
+                            <div>{props.num_of_student}人中{props.rank}位</div>
+                        </div>
+                        <div className="col token-result d-flex flex-column">
+                            <div>獲得点数</div>
+                            <div>{Number(props.result)/40}点</div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </>
         );
     } else {
-        return <></>;
+        return (
+            <>
+                <div className="user_card">
+                    <Button variant="primary" onClick={() => Setstate(true)} style={{ position: "absolute", top: 0, left: 0 }}>
+                        <>キャンセル</>
+                    </Button>
+                    <div style={{ "margin-top": "30px" }}>
+                        <Form onSubmit={update_handler}>
+                            <div className="icon_image">
+                                <Form.Group className="mb-3" controlId="form_image_url" style={{ textAlign: "left" }}>
+                                    <Form.Label>アイコン</Form.Label>
+                                    <Form.Control type="text" placeholder="image_url" value={image_url} onChange={(event) => SetImage_url(event.target.value)} />
+                                </Form.Group>
+                            </div>
+                            <img src={image_url} alt="" style={{ width: `75px`, height: `75px`, borderRadius: "50%" }} />
+
+                            <div className="user_name">
+                                {nameError && <p style={{ color: "red" }}>入力形式が間違っています</p>}
+                                <Form.Group className="mb-3" controlId="form_name" style={{ textAlign: "left" }}>
+                                    <Form.Label>User_Name 例:22P5000</Form.Label>
+                                    <Form.Control type="name" placeholder="Enter Name" value={name} onChange={handle_SetName} />
+                                </Form.Group>
+                            </div>
+                            <Button variant="primary" onClick={update_handler} style={{ marginTop: "20px" }}>
+                                <>更新</>
+                            </Button>
+                        </Form>
+                    </div>
+                    <div className="address">{props.address.slice(0, 20)}</div>
+                    <div className="row" style={{ marginTop: "20px" }}>
+                        <div className="col token d-flex flex-column">
+                            <div>保有トークン</div>
+                            <div>{props.token}FLT</div>
+                        </div>
+                        <div className="col token-result d-flex flex-column">
+                            <div>授業での配点</div>
+                            <div>{Number(props.result)/40}点</div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
     }
 }
-
-export default User_page;
+export default User_card;
